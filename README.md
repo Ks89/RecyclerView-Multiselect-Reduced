@@ -8,7 +8,7 @@ RecyclerView Multiselect
 
 **This app can be used as a copy-and-paste pattern to implement RecyclerView Multiselect**
 
-**RecyclerView Multiselect isn't changed**
+**RecyclerView Multiselect wasn't changed**
 
 ========================
 
