@@ -1,6 +1,13 @@
 RecyclerView Multiselect
 ========================
 
+**I created this fork to reduce the demo application called criminalintent-sample.**
+**My version has only the RecyclerView with multichoice mode, without additional stuff, like photo management and so on.**
+**I also moved the Custom Adapter to another class file**
+**This app can be used as a pattern to implement RecyclerView Multiselect**
+
+========================
+
 RecyclerView MultiSelect is a tool to help implement single or multichoice selection on RecyclerView items. It does not provide the same interface as ListView's setChoiceMode(), but can do everything setChoiceMode() does. It is also small with a limited set of responsibilities, which means it should be suitable for coercing into off label uses.
 
 To import, add the following line to your build.gradle:
