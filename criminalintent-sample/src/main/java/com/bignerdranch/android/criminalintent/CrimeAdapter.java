@@ -67,7 +67,6 @@ public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder>
     }
 
     public class CrimeHolder extends SwappingHolder implements View.OnClickListener, View.OnLongClickListener {
-        private final TextView mTitleTextView;
         private final TextView mDateTextView;
         private Crime mCrime;
         private CrimeListFragment crimeListFragment;
@@ -77,7 +76,6 @@ public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder>
 
             this.crimeListFragment = crimeListFragment;
 
-            mTitleTextView = (TextView) itemView.findViewById(R.id.crime_list_item_titleTextView);
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_list_item_dateTextView);
             itemView.setOnClickListener(this);
             itemView.setLongClickable(true);
@@ -86,21 +84,15 @@ public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder>
 
         public void bindCrime(Crime crime) {
             mCrime = crime;
-            mTitleTextView.setText(crime.getTitle());
             mDateTextView.setText(crime.getDate().toString());
         }
 
         @Override
         public void onClick(View v) {
-
             if (mCrime == null) {
                 return;
             }
-
             this.crimeListFragment.onClick(this,mCrime);
-
-
-
         }
 
 
@@ -108,7 +100,6 @@ public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder>
         public boolean onLongClick(View v) {
 
             this.crimeListFragment.onLongClick(this);
-//            ((AppCompatActivity) getActivity()).startSupportActionMode(mDeleteMode);
 //            mMultiSelector.setSelected(this, true);
             return true;
         }

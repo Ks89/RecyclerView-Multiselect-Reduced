@@ -75,7 +75,7 @@ public class CrimeListFragment extends Fragment {
                     for (int i = CrimeList.getInstance().getCrimeList().size(); i >= 0; i--) {
                         if (mMultiSelector.isSelected(i, 0)) {
                             Crime crime = CrimeList.getInstance().getCrimeList().get(i);
-                            CrimeLab.get(getActivity()).deleteCrime(crime);
+                            CrimeList.getInstance().getCrimeList().remove(crime);
                             mRecyclerView.getAdapter().notifyItemRemoved(i);
                         }
                     }
@@ -191,7 +191,7 @@ public class CrimeListFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId()==  R.id.menu_item_new_crime) {
             final Crime crime = new Crime();
-            CrimeLab.get(getActivity()).addCrime(crime);
+            CrimeList.getInstance().getCrimeList().add(crime);
 
             mRecyclerView.getAdapter().notifyItemInserted(CrimeList.getInstance().getCrimeList().indexOf(crime));
 
@@ -199,13 +199,13 @@ public class CrimeListFragment extends Fragment {
             // to wait until the new crime is added, then animate the selection of the new crime.
             // It does not work, though: the listener will be called immediately,
             // because no animations have been queued yet.
-//                mRecyclerView.getItemAnimator().isRunning(
-//                        new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
-//                    @Override
-//                    public void onAnimationsFinished() {
-//                        selectCrime(crime);
-//                    }
-//                });
+                mRecyclerView.getItemAnimator().isRunning(
+                        new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+                    @Override
+                    public void onAnimationsFinished() {
+                        selectCrime(crime);
+                    }
+                });
             return true;
         }
           else if(item.getItemId()== R.id.menu_item_show_subtitle) {

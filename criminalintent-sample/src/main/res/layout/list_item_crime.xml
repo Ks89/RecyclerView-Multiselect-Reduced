@@ -2,23 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="wrap_content" 
-  android:background="?android:attr/selectableItemBackground"
-    >
+  android:background="?android:attr/selectableItemBackground">
 
-  <TextView android:id="@+id/crime_list_item_titleTextView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-            android:textStyle="bold"
-    android:paddingLeft="4dp"
-    android:paddingRight="4dp"
-    android:text="Crime title" />
   <TextView android:id="@+id/crime_list_item_dateTextView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_below="@id/crime_list_item_titleTextView"
-            android:paddingLeft="4dp"
+    android:paddingLeft="4dp"
     android:paddingRight="4dp"
     android:paddingTop="4dp"
+    android:layout_marginTop="15dp"
+    android:layout_marginBottom="15dp"
+    android:layout_marginLeft="15dp"
     android:text="Crime date" />
 </RelativeLayout>
 
