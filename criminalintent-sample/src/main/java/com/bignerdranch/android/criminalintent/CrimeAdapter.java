@@ -39,19 +39,24 @@ import com.bignerdranch.android.multiselector.SwappingHolder;
  */
 public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder> {
 
-    private CrimeListFragment crimeListFragment;
     private final MultiSelector mMultiSelector;
+    private final OnClickInterface clickListener;
 
-    public CrimeAdapter (CrimeListFragment crimeListFragment, MultiSelector mMultiSelector ) {
-        this.crimeListFragment = crimeListFragment;
+    public CrimeAdapter (MultiSelector mMultiSelector, OnClickInterface clickListener ) {
         this.mMultiSelector = mMultiSelector;
+        this.clickListener = clickListener;
+    }
+
+    public interface OnClickInterface {
+        void longClickOnItem(CrimeAdapter.CrimeHolder crimeHolder);
+        void clickOnItem(CrimeAdapter.CrimeHolder crimeHolder);
     }
 
     @Override
     public CrimeHolder onCreateViewHolder(ViewGroup parent, int pos) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_crime, parent, false);
-        return new CrimeHolder(view,crimeListFragment);
+        return new CrimeHolder(view);
     }
 
     @Override
@@ -66,15 +71,14 @@ public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder>
         return CrimeList.getInstance().getCrimeList().size();
     }
 
+
+
     public class CrimeHolder extends SwappingHolder implements View.OnClickListener, View.OnLongClickListener {
         private final TextView mDateTextView;
         private Crime mCrime;
-        private CrimeListFragment crimeListFragment;
 
-        public CrimeHolder(View itemView, CrimeListFragment crimeListFragment) {
+        public CrimeHolder(View itemView) {
             super(itemView, mMultiSelector);
-
-            this.crimeListFragment = crimeListFragment;
 
             mDateTextView = (TextView) itemView.findViewById(R.id.crime_list_item_dateTextView);
             itemView.setOnClickListener(this);
@@ -87,20 +91,19 @@ public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder>
             mDateTextView.setText(crime.getDate().toString());
         }
 
+        public Crime getCrime() {
+            return mCrime;
+        }
+
         @Override
         public void onClick(View v) {
-            if (mCrime == null) {
-                return;
-            }
-            this.crimeListFragment.onClick(this,mCrime);
+            clickListener.clickOnItem(this);
         }
 
 
         @Override
         public boolean onLongClick(View v) {
-
-            this.crimeListFragment.onLongClick(this);
-//            mMultiSelector.setSelected(this, true);
+            clickListener.longClickOnItem(this);
             return true;
         }
 

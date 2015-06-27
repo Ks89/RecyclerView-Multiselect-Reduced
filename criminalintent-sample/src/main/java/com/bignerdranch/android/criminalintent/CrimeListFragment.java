@@ -51,7 +51,9 @@ import android.view.ViewGroup;
 import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
 import com.bignerdranch.android.multiselector.MultiSelector;
 
-public class CrimeListFragment extends Fragment {
+public class CrimeListFragment extends Fragment  implements
+        CrimeAdapter.OnClickInterface {
+
     private static final String TAG = "crimeListFragment";
     private RecyclerView mRecyclerView;
     private MultiSelector mMultiSelector = new MultiSelector();
@@ -143,34 +145,13 @@ public class CrimeListFragment extends Fragment {
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(new CrimeAdapter(this,mMultiSelector));
+        mRecyclerView.setAdapter(new CrimeAdapter(mMultiSelector,this));
 
         return v;
     }
 
     private void selectCrime(Crime c) {
-        Log.d(TAG, "crime selected " + c.toString());
-        // start an instance of CrimePagerActivity
-//        Intent i = new Intent(getActivity(), CrimePagerActivity.class);
-//        i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            // NOTE: shared element transition here.
-//            // Support library fragments do not support the three parameter
-//            // startActivityForResult call. So to get this to work, the entire
-//            // project had to be shifted over to use stdlib fragments,
-//            // and the v13 ViewPager.
-//            int index = mCrimes.indexOf(c);
-//            CrimeHolder holder = (CrimeHolder) mRecyclerView
-//                    .findViewHolderForPosition(index);
-//
-//            ActivityOptions options = CrimePagerActivity.getTransition(
-//                    getActivity(), holder.itemView);
-//
-//            startActivityForResult(i, 0, options.toBundle());
-//        } else {
-//            startActivityForResult(i, 0);
-//        }
+        Log.d(TAG, "Crime list item clicked");
     }
 
     @Override
@@ -199,16 +180,15 @@ public class CrimeListFragment extends Fragment {
             // to wait until the new crime is added, then animate the selection of the new crime.
             // It does not work, though: the listener will be called immediately,
             // because no animations have been queued yet.
-                mRecyclerView.getItemAnimator().isRunning(
-                        new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
+            mRecyclerView.getItemAnimator().isRunning(
+                    new RecyclerView.ItemAnimator.ItemAnimatorFinishedListener() {
                     @Override
                     public void onAnimationsFinished() {
                         selectCrime(crime);
                     }
                 });
             return true;
-        }
-          else if(item.getItemId()== R.id.menu_item_show_subtitle) {
+        } else if(item.getItemId()== R.id.menu_item_show_subtitle) {
                 ActionBar actionBar = getActionBar();
                 if (actionBar.getSubtitle() == null) {
                     actionBar.setSubtitle(R.string.subtitle);
@@ -231,25 +211,21 @@ public class CrimeListFragment extends Fragment {
         getActivity().getMenuInflater().inflate(R.menu.crime_list_item_context, menu);
     }
 
-
-    public void onClick(CrimeAdapter.CrimeHolder crimeHolder, Crime crime) {
-        if (!mMultiSelector.tapSelection(crimeHolder)) {
-            selectCrime(crime);
-        }
+    protected ActionBar getActionBar() {
+        return ((AppCompatActivity) getActivity()).getSupportActionBar();
     }
 
-    public void onLongClick(CrimeAdapter.CrimeHolder crimeHolder) {
+    @Override
+    public void longClickOnItem(CrimeAdapter.CrimeHolder crimeHolder) {
         ((AppCompatActivity) getActivity()).startSupportActionMode(mDeleteMode);
         mMultiSelector.setSelected(crimeHolder, true);
     }
 
-
-
-
-
-
-    protected ActionBar getActionBar() {
-        return ((AppCompatActivity) getActivity()).getSupportActionBar();
+    @Override
+    public void clickOnItem(CrimeAdapter.CrimeHolder crimeHolder) {
+        if (!mMultiSelector.tapSelection(crimeHolder)) {
+            selectCrime(crimeHolder.getCrime());
+        }
     }
 }
 
