@@ -23,36 +23,40 @@
  */
 
 /**
- * Created by https://github.com/bignerdranch/recyclerview-multiselect
- * modified by Stefano Cappa on 27/06/15.
+ * Created by Stefano Cappa on 27/06/15.
  */
 
 package com.bignerdranch.android.criminalintent;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import java.util.ArrayList;
+import java.util.List;
 
-public class CrimeListActivity extends AppCompatActivity {
+/**
+ * Created by Stefano Cappa on 22/06/15.
+ */
+public class CrimeList {
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment);
-        FragmentManager manager = getFragmentManager();
-        Fragment fragment = manager.findFragmentById(R.id.fragmentContainer);
+    private final List<Crime> crimeList;
 
-        if (fragment == null) {
-            fragment = createFragment();
-            manager.beginTransaction()
-                    .add(R.id.fragmentContainer, fragment)
-                    .commit();
-        }
+    public List<Crime> getCrimeList() {
+        return crimeList;
     }
 
+    private static final CrimeList instance = new CrimeList();
 
-    protected Fragment createFragment() {
-        return new CrimeListFragment();
+    /**
+     * Method to get the instance of this class.
+     *
+     * @return instance of this class.
+     */
+    public static CrimeList getInstance() {
+        return instance;
+    }
+
+    /**
+     * Private constructor, because is a singleton class.
+     */
+    private CrimeList() {
+        crimeList = new ArrayList<>();
     }
 }

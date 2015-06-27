@@ -1,9 +1,37 @@
+/**
+ * The MIT License (MIT)
+
+ Copyright (c) 2015 Stefano Cappa
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ */
+
+/**
+ * Created by https://github.com/bignerdranch/recyclerview-multiselect
+ * modified by Stefano Cappa on 27/06/15.
+ */
+
 package com.bignerdranch.android.criminalintent;
 
 import android.annotation.TargetApi;
-import android.app.ActivityOptions;
+import android.app.Fragment;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,19 +47,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.TextView;
 
 import com.bignerdranch.android.multiselector.ModalMultiSelectorCallback;
 import com.bignerdranch.android.multiselector.MultiSelector;
-import com.bignerdranch.android.multiselector.SwappingHolder;
 
-import java.util.ArrayList;
-
-public class CrimeListFragment extends BaseFragment {
+public class CrimeListFragment extends Fragment {
     private static final String TAG = "crimeListFragment";
     private RecyclerView mRecyclerView;
     private MultiSelector mMultiSelector = new MultiSelector();
+
     private ModalMultiSelectorCallback mDeleteMode = new ModalMultiSelectorCallback(mMultiSelector) {
 
         @Override
@@ -48,9 +72,9 @@ public class CrimeListFragment extends BaseFragment {
                     // not after. No idea why, but it crashes.
                     actionMode.finish();
 
-                    for (int i = mCrimes.size(); i >= 0; i--) {
+                    for (int i = CrimeList.getInstance().getCrimeList().size(); i >= 0; i--) {
                         if (mMultiSelector.isSelected(i, 0)) {
-                            Crime crime = mCrimes.get(i);
+                            Crime crime = CrimeList.getInstance().getCrimeList().get(i);
                             CrimeLab.get(getActivity()).deleteCrime(crime);
                             mRecyclerView.getAdapter().notifyItemRemoved(i);
                         }
@@ -63,7 +87,7 @@ public class CrimeListFragment extends BaseFragment {
             return false;
         }
     };
-    private ArrayList<Crime> mCrimes;
+
     private boolean mSubtitleVisible;
 
     @Override
@@ -119,34 +143,34 @@ public class CrimeListFragment extends BaseFragment {
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mCrimes = CrimeLab.get(getActivity()).getCrimes();
-        mRecyclerView.setAdapter(new CrimeAdapter());
+        mRecyclerView.setAdapter(new CrimeAdapter(this,mMultiSelector));
 
         return v;
     }
 
     private void selectCrime(Crime c) {
+        Log.d(TAG, "crime selected " + c.toString());
         // start an instance of CrimePagerActivity
-        Intent i = new Intent(getActivity(), CrimePagerActivity.class);
-        i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // NOTE: shared element transition here.
-            // Support library fragments do not support the three parameter
-            // startActivityForResult call. So to get this to work, the entire
-            // project had to be shifted over to use stdlib fragments,
-            // and the v13 ViewPager.
-            int index = mCrimes.indexOf(c);
-            CrimeHolder holder = (CrimeHolder) mRecyclerView
-                    .findViewHolderForPosition(index);
-
-            ActivityOptions options = CrimePagerActivity.getTransition(
-                    getActivity(), holder.itemView);
-
-            startActivityForResult(i, 0, options.toBundle());
-        } else {
-            startActivityForResult(i, 0);
-        }
+//        Intent i = new Intent(getActivity(), CrimePagerActivity.class);
+//        i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            // NOTE: shared element transition here.
+//            // Support library fragments do not support the three parameter
+//            // startActivityForResult call. So to get this to work, the entire
+//            // project had to be shifted over to use stdlib fragments,
+//            // and the v13 ViewPager.
+//            int index = mCrimes.indexOf(c);
+//            CrimeHolder holder = (CrimeHolder) mRecyclerView
+//                    .findViewHolderForPosition(index);
+//
+//            ActivityOptions options = CrimePagerActivity.getTransition(
+//                    getActivity(), holder.itemView);
+//
+//            startActivityForResult(i, 0, options.toBundle());
+//        } else {
+//            startActivityForResult(i, 0);
+//        }
     }
 
     @Override
@@ -169,7 +193,7 @@ public class CrimeListFragment extends BaseFragment {
             final Crime crime = new Crime();
             CrimeLab.get(getActivity()).addCrime(crime);
 
-            mRecyclerView.getAdapter().notifyItemInserted(mCrimes.indexOf(crime));
+            mRecyclerView.getAdapter().notifyItemInserted(CrimeList.getInstance().getCrimeList().indexOf(crime));
 
             // NOTE: Left this code in for commentary. I believe this is what you would do
             // to wait until the new crime is added, then animate the selection of the new crime.
@@ -184,7 +208,7 @@ public class CrimeListFragment extends BaseFragment {
 //                });
             return true;
         }
-          else if(item.getItemId()==R.id.menu_item_show_subtitle) {
+          else if(item.getItemId()== R.id.menu_item_show_subtitle) {
                 ActionBar actionBar = getActionBar();
                 if (actionBar.getSubtitle() == null) {
                     actionBar.setSubtitle(R.string.subtitle);
@@ -208,74 +232,24 @@ public class CrimeListFragment extends BaseFragment {
     }
 
 
-    private class CrimeHolder extends SwappingHolder implements View.OnClickListener, View.OnLongClickListener {
-        private final TextView mTitleTextView;
-        private final TextView mDateTextView;
-        private final CheckBox mSolvedCheckBox;
-        private Crime mCrime;
-
-        public CrimeHolder(View itemView) {
-            super(itemView, mMultiSelector);
-
-            mTitleTextView = (TextView) itemView.findViewById(R.id.crime_list_item_titleTextView);
-            mDateTextView = (TextView) itemView.findViewById(R.id.crime_list_item_dateTextView);
-            mSolvedCheckBox = (CheckBox) itemView.findViewById(R.id.crime_list_item_solvedCheckBox);
-            itemView.setOnClickListener(this);
-            itemView.setLongClickable(true);
-            itemView.setOnLongClickListener(this);
+    public void onClick(CrimeAdapter.CrimeHolder crimeHolder, Crime crime) {
+        if (!mMultiSelector.tapSelection(crimeHolder)) {
+            selectCrime(crime);
         }
+    }
 
-        public void bindCrime(Crime crime) {
-            mCrime = crime;
-            mTitleTextView.setText(crime.getTitle());
-            mDateTextView.setText(crime.getDate().toString());
-            mSolvedCheckBox.setChecked(crime.isSolved());
-        }
-
-        @Override
-        public void onClick(View v) {
-
-            if (mCrime == null) {
-                return;
-            }
-            if (!mMultiSelector.tapSelection(this)) {
-                selectCrime(mCrime);
-            }
-
-        }
-
-
-        @Override
-        public boolean onLongClick(View v) {
-
-            ((AppCompatActivity) getActivity()).startSupportActionMode(mDeleteMode);
-            mMultiSelector.setSelected(this, true);
-            return true;
-        }
-
-
+    public void onLongClick(CrimeAdapter.CrimeHolder crimeHolder) {
+        ((AppCompatActivity) getActivity()).startSupportActionMode(mDeleteMode);
+        mMultiSelector.setSelected(crimeHolder, true);
     }
 
 
-    private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
-        @Override
-        public CrimeHolder onCreateViewHolder(ViewGroup parent, int pos) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_item_crime, parent, false);
-            return new CrimeHolder(view);
-        }
 
-        @Override
-        public void onBindViewHolder(CrimeHolder holder, int pos) {
-            Crime crime = mCrimes.get(pos);
-            holder.bindCrime(crime);
-            Log.d(TAG, "binding crime" + crime + "at position" + pos);
-        }
 
-        @Override
-        public int getItemCount() {
-            return mCrimes.size();
-        }
+
+
+    protected ActionBar getActionBar() {
+        return ((AppCompatActivity) getActivity()).getSupportActionBar();
     }
 }
 
