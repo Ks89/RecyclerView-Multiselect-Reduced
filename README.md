@@ -1,12 +1,12 @@
 RecyclerView Multiselect
 ========================
 
-**I created this fork to reduce the demo application called criminalintent-sample.**
+**I forked this project to reduce the demo application called criminalintent-sample.**
 
 **My version has only the RecyclerView with multichoice mode, without additional stuff, like photo management and so on.**
 **I also moved the Custom Adapter to another class file.**
 
-**This app can be used as a copy-and-paste pattern to implement RecyclerView Multiselect**
+**This app can be used as a "copy-and-paste" pattern to implement RecyclerView Multiselect**
 
 **RecyclerView Multiselect library wasn't changed**
 
